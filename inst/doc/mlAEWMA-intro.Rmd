@@ -1,0 +1,154 @@
+---
+title: "Getting started with mlAEWMA"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with mlAEWMA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(mlAEWMA)
+```
+
+## What the package does
+
+`mlAEWMA` monitors the **variance** of a process with adaptive EWMA control
+charts. For every subgroup of five measurements the sample variance is
+transformed (Castagliola, 2005), a pre-fitted model predicts the smoothing
+weight `theta` in [0, 1], and the chart statistic is updated as
+
+`AEWMA_t = theta_t * D_t + (1 - theta_t) * AEWMA_(t-1)`.
+
+The first subgroup with `|AEWMA_t| > h` is a signal. Nine models in four
+families are available, each with a control limit `h` calibrated to an
+in-control average run length (ARL0) of about 370:
+
+| Family | Function | Models |
+|---|---|---|
+| Neural networks | `mlaewma_neural()` | `nn`, `qrnn`, `mcqrnn` |
+| Support vector machines | `mlaewma_svm()` | `svr`, `svqr`, `rsvqr` |
+| Trees | `mlaewma_tree()` | `dt`, `gb` |
+| Dynamic quantile regression | `mlaewma_dqr()` | `dqr` |
+
+Only subgroups of size 5 are supported.
+
+## Running a chart
+
+`patient` holds 30 subgroups of five measurements (Jones-Farmer and Champ,
+2010); the in-control standard deviation of this example is 4.05.
+
+```{r single}
+data(patient)
+res <- mlaewma_neural(patient, method = "nn", sigma0 = 4.05)
+res$h
+res$first_signal
+head(res$results, 3)
+```
+
+`first_signal` is the number of the first subgroup that signals (`NA` when
+the chart never signals).
+
+### Choosing `sigma0`
+
+`sigma0` is the standard deviation of the process **while it is in control**,
+estimated from a clean reference sample. If you leave it out, the standard
+deviation of all observations is used, which is inflated when the data already
+contain an out-of-control stretch and can hide the shift.
+
+### A chart that signals
+
+Here the standard deviation doubles after subgroup 20 (100 observations in
+control, then 60 out of control, in subgroups of five):
+
+```{r signal}
+set.seed(10)
+x <- c(rnorm(100, sd = 2), rnorm(60, sd = 4))
+mlaewma_svm(x, method = "svqr", sigma0 = 2)$first_signal
+mlaewma_dqr(x, sigma0 = 2)$first_signal
+```
+
+## Comparing all nine charts
+
+```{r compare}
+cmp <- mlaewma_compare(patient, sigma0 = 4.05)
+cmp$comparison
+```
+
+## Run lengths by simulation
+
+`calculate_arl()` estimates the average run length. With `shift = 1` it
+returns ARL0; larger values of `shift` simulate a variance increase.
+
+```{r arl}
+calculate_arl("nn", h_value = 0.846, nsim = 200, seed = 1)
+```
+
+For example, the in-control ARL0 and the ARL after a 50 percent and a 100
+percent variance increase (`shift` = 1.5 and 2) of three models:
+
+```{r shifts}
+h <- c(nn = 0.846, qrnn = 1.968, svqr = 0.568)
+sapply(c(1, 1.5, 2), function(s) {
+  sapply(names(h), function(m) {
+    round(calculate_arl(m, h[[m]], shift = s, nsim = 300, seed = 3)[["ARL"]])
+  })
+})
+```
+
+Rows are the models, columns `shift` = 1, 1.5, 2. All models are calibrated to
+the same ARL0 of about 370, but their ability to detect a change differs
+(see the limitations below).
+
+Simulation results depend on `seed`, `nsim` and `n_streams` (default 3, the
+setting used for the calibration) but never on `n_cores`, which only decides
+how many worker processes run the streams. Your own random number generator
+state is left unchanged.
+
+Searching a new control limit (`find_h = TRUE`) and the out-of-control
+comparison (`shifts = ...`) use many simulations and are slow, so they are not
+run here.
+
+## Limitations
+
+* The charts are calibrated for an ARL0 of about 370 within roughly 2 percent.
+* `qrnn` and `mcqrnn` give almost no weight to large positive values of the
+  transformed statistic: their ARL for a variance increase by a factor of 1.5
+  is longer than the in-control ARL. They are not suitable for monitoring
+  variance increases.
+* `nn`, `dt`, `gb` and `dqr` detect variance increases but practically not
+  decreases; `svr`, `svqr` and `rsvqr` react in both directions.
+* The models were trained on transformed values between 0 and 1.9, but about
+  half of the in-control values are negative, so the predicted weights are
+  partly extrapolated.
+* Only subgroups of size 5 are supported.
+
+## References
+
+Atar, G., Purutçuoğlu, V. and Bursalı, A. (2026). Comparison of machine
+learning models in a parameter-free adaptive EWMA control chart for process
+dispersion monitoring. Accepted at the 3rd International Congress on Data
+Science and Information Technologies (INFTEC 2026).
+
+Capizzi, G. and Masarotto, G. (2003). An adaptive exponentially weighted moving
+average control chart. *Technometrics*, 45(3), 199-207.
+doi:10.1198/004017003000000023
+
+Castagliola, P. (2005). A new S2-EWMA control chart for monitoring the process
+variance. *Quality and Reliability Engineering International*, 21(8), 781-794.
+doi:10.1002/qre.686
+
+Jones-Farmer, L. A. and Champ, C. W. (2010). A distribution-free phase I
+control chart for subgroup scale. *Journal of Quality Technology*, 42(4),
+373-387. doi:10.1080/00224065.2010.11917834 (reference for the `patient`
+example data set).
+
+Kazmi, M. W. and Noor-ul-Amin, M. (2024). Adaptive EWMA control chart by using
+support vector regression. *Quality and Reliability Engineering International*,
+40(7), 3831-3843. doi:10.1002/qre.3603
+
+Noor-ul-Amin, M., Kazmi, M. W., Alkhalaf, S., Abdel-Khalek, S. and Nabi, M.
+(2024). Machine learning based parameter-free adaptive EWMA control chart to
+monitor process dispersion. *Scientific Reports*, 14, 31271.
+doi:10.1038/s41598-024-82699-8

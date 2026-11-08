@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started with mlAEWMA</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with mlAEWMA</h1>
+
+
+
+<div id="what-the-package-does" class="section level2">
+<h2>What the package does</h2>
+<p><code>mlAEWMA</code> monitors the <strong>variance</strong> of a
+process with adaptive EWMA control charts. For every subgroup of five
+measurements the sample variance is transformed (Castagliola, 2005), a
+pre-fitted model predicts the smoothing weight <code>theta</code> in [0,
+1], and the chart statistic is updated as</p>
+<p><code>AEWMA_t = theta_t * D_t + (1 - theta_t) * AEWMA_(t-1)</code>.</p>
+<p>The first subgroup with <code>|AEWMA_t| &gt; h</code> is a signal.
+Nine models in four families are available, each with a control limit
+<code>h</code> calibrated to an in-control average run length (ARL0) of
+about 370:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Family</th>
+<th>Function</th>
+<th>Models</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Neural networks</td>
+<td><code>mlaewma_neural()</code></td>
+<td><code>nn</code>, <code>qrnn</code>, <code>mcqrnn</code></td>
+</tr>
+<tr class="even">
+<td>Support vector machines</td>
+<td><code>mlaewma_svm()</code></td>
+<td><code>svr</code>, <code>svqr</code>, <code>rsvqr</code></td>
+</tr>
+<tr class="odd">
+<td>Trees</td>
+<td><code>mlaewma_tree()</code></td>
+<td><code>dt</code>, <code>gb</code></td>
+</tr>
+<tr class="even">
+<td>Dynamic quantile regression</td>
+<td><code>mlaewma_dqr()</code></td>
+<td><code>dqr</code></td>
+</tr>
+</tbody>
+</table>
+<p>Only subgroups of size 5 are supported.</p>
+</div>
+<div id="running-a-chart" class="section level2">
+<h2>Running a chart</h2>
+<p><code>patient</code> holds 30 subgroups of five measurements
+(Jones-Farmer and Champ, 2010); the in-control standard deviation of
+this example is 4.05.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(patient)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">mlaewma_neural</span>(patient, <span class="at">method =</span> <span class="st">&quot;nn&quot;</span>, <span class="at">sigma0 =</span> <span class="fl">4.05</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>res<span class="sc">$</span>h</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.846</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>res<span class="sc">$</span>first_signal</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">head</span>(res<span class="sc">$</span>results, <span class="dv">3</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt;   Subgroup Variance          D      Theta       AEWMA     h Exceeds_Limit</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; 1        1      4.7 -1.1872821 0.04177838 -0.04960272 0.846         FALSE</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; 2        2      9.5 -0.5113669 0.03352569 -0.06508368 0.846         FALSE</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; 3        3     11.7 -0.2561910 0.02254078 -0.06939139 0.846         FALSE</span></span></code></pre></div>
+<p><code>first_signal</code> is the number of the first subgroup that
+signals (<code>NA</code> when the chart never signals).</p>
+<div id="choosing-sigma0" class="section level3">
+<h3>Choosing <code>sigma0</code></h3>
+<p><code>sigma0</code> is the standard deviation of the process
+<strong>while it is in control</strong>, estimated from a clean
+reference sample. If you leave it out, the standard deviation of all
+observations is used, which is inflated when the data already contain an
+out-of-control stretch and can hide the shift.</p>
+</div>
+<div id="a-chart-that-signals" class="section level3">
+<h3>A chart that signals</h3>
+<p>Here the standard deviation doubles after subgroup 20 (100
+observations in control, then 60 out of control, in subgroups of
+five):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="at">sd =</span> <span class="dv">2</span>), <span class="fu">rnorm</span>(<span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">4</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">mlaewma_svm</span>(x, <span class="at">method =</span> <span class="st">&quot;svqr&quot;</span>, <span class="at">sigma0 =</span> <span class="dv">2</span>)<span class="sc">$</span>first_signal</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] 27</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">mlaewma_dqr</span>(x, <span class="at">sigma0 =</span> <span class="dv">2</span>)<span class="sc">$</span>first_signal</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; [1] 22</span></span></code></pre></div>
+</div>
+</div>
+<div id="comparing-all-nine-charts" class="section level2">
+<h2>Comparing all nine charts</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>cmp <span class="ot">&lt;-</span> <span class="fu">mlaewma_compare</span>(patient, <span class="at">sigma0 =</span> <span class="fl">4.05</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>cmp<span class="sc">$</span>comparison</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;   Family Method     h First_Signal</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 1 Neural     NN 0.846           NA</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 2 Neural   QRNN 1.968           NA</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 3 Neural MCQRNN 1.968           NA</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 4    SVM    SVR 0.661           NA</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 5    SVM   SVQR 0.568           NA</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; 6    SVM  RSVQR 0.703           NA</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 7   Tree     DT 1.385           NA</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 8   Tree     GB 1.355           NA</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; 9    DQR    DQR 2.742           NA</span></span></code></pre></div>
+</div>
+<div id="run-lengths-by-simulation" class="section level2">
+<h2>Run lengths by simulation</h2>
+<p><code>calculate_arl()</code> estimates the average run length. With
+<code>shift = 1</code> it returns ARL0; larger values of
+<code>shift</code> simulate a variance increase.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">calculate_arl</span>(<span class="st">&quot;nn&quot;</span>, <span class="at">h_value =</span> <span class="fl">0.846</span>, <span class="at">nsim =</span> <span class="dv">200</span>, <span class="at">seed =</span> <span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;         ARL        SDRL      ARL_SE Censor_Rate </span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt;    374.8250    326.9365     23.1179      0.0000</span></span></code></pre></div>
+<p>For example, the in-control ARL0 and the ARL after a 50 percent and a
+100 percent variance increase (<code>shift</code> = 1.5 and 2) of three
+models:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">nn =</span> <span class="fl">0.846</span>, <span class="at">qrnn =</span> <span class="fl">1.968</span>, <span class="at">svqr =</span> <span class="fl">0.568</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">sapply</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>), <span class="cf">function</span>(s) {</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">sapply</span>(<span class="fu">names</span>(h), <span class="cf">function</span>(m) {</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">calculate_arl</span>(m, h[[m]], <span class="at">shift =</span> s, <span class="at">nsim =</span> <span class="dv">300</span>, <span class="at">seed =</span> <span class="dv">3</span>)[[<span class="st">&quot;ARL&quot;</span>]])</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  })</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>})</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; nn    395   22   12</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; qrnn  350  740  108</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; svqr  412   20   10</span></span></code></pre></div>
+<p>Rows are the models, columns <code>shift</code> = 1, 1.5, 2. All
+models are calibrated to the same ARL0 of about 370, but their ability
+to detect a change differs (see the limitations below).</p>
+<p>Simulation results depend on <code>seed</code>, <code>nsim</code> and
+<code>n_streams</code> (default 3, the setting used for the calibration)
+but never on <code>n_cores</code>, which only decides how many worker
+processes run the streams. Your own random number generator state is
+left unchanged.</p>
+<p>Searching a new control limit (<code>find_h = TRUE</code>) and the
+out-of-control comparison (<code>shifts = ...</code>) use many
+simulations and are slow, so they are not run here.</p>
+</div>
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<ul>
+<li>The charts are calibrated for an ARL0 of about 370 within roughly 2
+percent.</li>
+<li><code>qrnn</code> and <code>mcqrnn</code> give almost no weight to
+large positive values of the transformed statistic: their ARL for a
+variance increase by a factor of 1.5 is longer than the in-control ARL.
+They are not suitable for monitoring variance increases.</li>
+<li><code>nn</code>, <code>dt</code>, <code>gb</code> and
+<code>dqr</code> detect variance increases but practically not
+decreases; <code>svr</code>, <code>svqr</code> and <code>rsvqr</code>
+react in both directions.</li>
+<li>The models were trained on transformed values between 0 and 1.9, but
+about half of the in-control values are negative, so the predicted
+weights are partly extrapolated.</li>
+<li>Only subgroups of size 5 are supported.</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Atar, G., Purutçuoğlu, V. and Bursalı, A. (2026). Comparison of
+machine learning models in a parameter-free adaptive EWMA control chart
+for process dispersion monitoring. Accepted at the 3rd International
+Congress on Data Science and Information Technologies (INFTEC 2026).</p>
+<p>Capizzi, G. and Masarotto, G. (2003). An adaptive exponentially
+weighted moving average control chart. <em>Technometrics</em>, 45(3),
+199-207. <a href="doi:10.1198/004017003000000023" class="uri">doi:10.1198/004017003000000023</a></p>
+<p>Castagliola, P. (2005). A new S2-EWMA control chart for monitoring
+the process variance. <em>Quality and Reliability Engineering
+International</em>, 21(8), 781-794. <a href="doi:10.1002/qre.686" class="uri">doi:10.1002/qre.686</a></p>
+<p>Jones-Farmer, L. A. and Champ, C. W. (2010). A distribution-free
+phase I control chart for subgroup scale. <em>Journal of Quality
+Technology</em>, 42(4), 373-387. <a href="doi:10.1080/00224065.2010.11917834" class="uri">doi:10.1080/00224065.2010.11917834</a> (reference for the
+<code>patient</code> example data set).</p>
+<p>Kazmi, M. W. and Noor-ul-Amin, M. (2024). Adaptive EWMA control chart
+by using support vector regression. <em>Quality and Reliability
+Engineering International</em>, 40(7), 3831-3843. <a href="doi:10.1002/qre.3603" class="uri">doi:10.1002/qre.3603</a></p>
+<p>Noor-ul-Amin, M., Kazmi, M. W., Alkhalaf, S., Abdel-Khalek, S. and
+Nabi, M. (2024). Machine learning based parameter-free adaptive EWMA
+control chart to monitor process dispersion. <em>Scientific
+Reports</em>, 14, 31271. <a href="doi:10.1038/s41598-024-82699-8" class="uri">doi:10.1038/s41598-024-82699-8</a></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
