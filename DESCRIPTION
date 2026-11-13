@@ -2,19 +2,19 @@ Package: mlAEWMA
 Type: Package
 Title: Machine Learning Based Adaptive EWMA Control Charts for Process
         Dispersion
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person(given = "Gizem",
            family = "Atar",
            email = "gizem.atar@ostimteknik.edu.tr",
            role = c("aut", "cre")),
-    person(given = "Ahmet",
-           family = "Bursalı",
-           email = "ahmet.bursali@huawei.com",
-           role = "aut"),
     person(given = "Vilda",
            family = "Purutçuoğlu",
            email = "vpurutcu@metu.edu.tr",
+           role = "aut"),
+    person(given = "Ahmet",
+           family = "Bursalı",
+           email = "ahmet.bursali@huawei.com",
            role = "aut")
   )
 Description: Monitors the variance of a process with adaptive exponentially
@@ -46,10 +46,10 @@ Config/testthat/edition: 3
 LazyData: true
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-10-21 11:38:22 UTC; gizem
+Packaged: 2026-11-11 10:33:04 UTC; gizem
 Author: Gizem Atar [aut, cre],
-  Ahmet Bursalı [aut],
-  Vilda Purutçuoğlu [aut]
+  Vilda Purutçuoğlu [aut],
+  Ahmet Bursalı [aut]
 Maintainer: Gizem Atar <gizem.atar@ostimteknik.edu.tr>
 Repository: CRAN
-Date/Publication: 2026-11-08 17:20:02 UTC
+Date/Publication: 2026-11-13 15:10:24 UTC

@@ -42,8 +42,8 @@ TRNC, 22-24 October 2026.
 
 Authors:
 \itemize{
-  \item Ahmet Bursalı \email{ahmet.bursali@huawei.com}
   \item Vilda Purutçuoğlu \email{vpurutcu@metu.edu.tr}
+  \item Ahmet Bursalı \email{ahmet.bursali@huawei.com}
 }
 
 }
